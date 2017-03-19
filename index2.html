@@ -265,11 +265,11 @@
 
                 sql.execute(query)
                     .done(function(data) {
-                        for (var i = 0; i < data.total_rows; i) {
+                        for (var i = 0; i < data.total_rows; i++) {
 
                             var name = data.rows[i].common;
 
-                            selector.append("<option value="  common  ">"  common  "</option>");
+                            selector.append("<option value=" + name +  ">" + name + "</option>");
                         }
                     });
 
@@ -280,9 +280,9 @@
 
                     var input = $(".species-selector option:selected").val();
 
-                    console.log("You have selected "  input  ".");
+                    console.log("You have selected " + input + ".");
 
-                    cityLayer.setSQL(query  " AND name ilike '"  input  "'");
+                    cityLayer.setSQL(query + " AND name like '" + input + "'");
 
                 });
             });
