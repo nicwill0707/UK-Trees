@@ -5,7 +5,7 @@
     <title>673 Module 07 N Williamson</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
 
     <style>
@@ -29,43 +29,58 @@
             background: rgba(192, 192, 192, 0.2);
             border-radius: 5px;
         }
+        /* Try Ramiro's code begin */
+
+        #wraper-tree-selector {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+        }
+        .js-tree-selector {
+          width: 175px;
+        }
+
     </style>
 </head>
+
 
 <body>
     <h1>University of Kentucky Tree Map</h1>
     <div id="map"></div>
 
+    <!-- selector div -->
+    <div id="wraper-tree-selector">
+      <select class="js-tree-selector">
+        <option value="#" selected disabled>Select a tree species</option>
+      </select>
+    </div>
+
+
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+
+    <!-- Try Javi's code begin -->
+
+    <!-- <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"> -->
+
+    <!-- Try Javi's code end -->
+
+    <!--try Ramiro's <code> begin -->
+
+    <!-- except this! -->
+    <!-- <link rel="stylesheet" href="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+        <script src="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/cartodb.js"></script> -->
+
+
+
+
+    <!--try Ramiro's <code> end -->
 
     <script type="cartocss/html" id="tree-styles">
 
-        #layer { marker-fill: #00FF7F; marker-allow-overlap: true; [distinc=1] { marker-fill: #52d017; } [distinc=2] { marker-fill: #136400; } [distinc=3] { marker-fill: #0000FF; } }
+        #layer { marker-fill: #00FF7F; marker-allow-overlap: true; [distinc=1] { marker-fill: #52d017; } [distinc=2] { marker-fill: #136400; } [distinc=3] { marker-fill: #0000FF; } } //
 
-    </script>
-
-
-    <script type="infowindow/html" id="infowindow_template">
-    <div class="CDB-Tooltip CDB-Tooltip--isLight">
-      <ul class="CDB-Tooltip-list">
-          <li class="CDB-Tooltip-listItem">
-              <h3 class="CDB-Tooltip-listTitle">dbh_bin</h3>
-            <h4 class="CDB-Tooltip-listText">{{dbh_bin}}</h4>
-          </li>
-          <li class="CDB-Tooltip-listItem">
-              <h3 class="CDB-Tooltip-listTitle">exact_dbh</h3>
-            <h4 class="CDB-Tooltip-listText">{{exact_dbh}}</h4>
-          </li>
-          <li class="CDB-Tooltip-listItem">
-              <h3 class="CDB-Tooltip-listTitle">botanical</h3>
-            <h4 class="CDB-Tooltip-listText">{{botanical}}</h4>
-          </li>
-          <li class="CDB-Tooltip-listItem">
-              <h3 class="CDB-Tooltip-listTitle">common</h3>
-            <h4 class="CDB-Tooltip-listText">{{common}}</h4>
-          </li>
-      </ul>
-    </div>
     </script>
 
     <script>
@@ -74,44 +89,70 @@
             zoom: 15,
         });
 
+        L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+        }).addTo(map);
+
+        //Try Ramiro's code begin //
+
+        // get selector
+        var selector = $(".js-tree-selector"),
+            query = "SELECT * FROM ukntrees_adopt_oct62016b_1";
+
+
+
         var sourceObject = {
             user_name: 'npwi222',
             type: 'cartodb',
-            sublayers: [{
-                    type: "http",
-                    urlTemplate: "http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-                    subdomains: ["a", "b", "c"]
-                },
+            sublayers: [
                 {
-                    sql: "SELECT * FROM ukntrees_adopt_oct62016b_1",
-                    cartocss: $("#tree-styles").text(),
-                    interactivity: 'cartodb_id'
+                    sql: query,
+                    cartocss: $("#tree-styles").text()
                 }
             ]
-        }
+        } //end sourceObject variable
 
-        cartodb.createLayer(map, sourceObject, {
-            infowindows: true,
-        })
+
+
+        cartodb.createLayer(map, sourceObject)
             .addTo(map)
             .done(function(layer) {
 
-                    var sublayer = layer.getSubLayer(1);
+                // declare sublayer variable
+                var treeLayer = layer.getSubLayer(0);
 
-                    cartodb.vis.Vis.addInfowindow(map, sublayer, ['common', 'botanical', 'exact_dbh', 'treeid'], {
-                        infowindowTemplate: $('#infowindow_template').text(),
-                        templateType: 'mustache'
+                console.log(treeLayer)
+
+                // populate selector with city names from sublayer data
+                var sql = new cartodb.SQL({
+                    user: 'npwi222'
+                });
+
+                sql.execute(query)
+                    .done(function(data) {
+
+                        for (var i = 0; i < data.total_rows; i++) {
+
+                            var name = data.rows[i].common;
+
+                            selector.append("<option value=" + name +  ">" + name + "</option>");
+                        }
                     });
 
-                      layer.leafletMap.viz.addOverlay({
-                      type: 'tooltip',
-                      layer: sublayer,
-                      template: $('#infowindow_template').text(),
-                      position: 'bottom|right',
-                      fields: [{ common:'common', botanical:'botanical', exact_dbh:'exact_dbh', treeid: 'treeid'}]
-                      });
+                selector.select2();
 
+                // filter cities when selecting an option from selector
+                selector.change(function() {
+
+                    var input = $(".js-tree-selector option:selected").html();
+
+                    console.log("You have selected " + input + ".");
+
+                    treeLayer.setSQL(query + " WHERE common = '" + input + "'");
+
+                });
             });
+
 
     </script>
 </body>
