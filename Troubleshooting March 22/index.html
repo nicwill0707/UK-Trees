@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>673 Module 07 N Williamson</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        h1 {
+            position: absolute;
+            z-index: 650;
+            top: 10px;
+            left: 50px;
+            padding: 8px 15px;
+            margin: 0;
+            color: whitesmoke;
+            font-size: 2em;
+            background: rgba(192, 192, 192, 0.2);
+            border-radius: 5px;
+        }
+        /* Try Ramiro's code begin */
+
+        #wraper-tree-selector {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+        }
+        .js-tree-selector {
+          width: 175px;
+        }
+
+    </style>
+</head>
+
+
+<body>
+    <h1>University of Kentucky Tree Map</h1>
+    <div id="map"></div>
+
+    <!-- selector div -->
+    <div id="wraper-tree-selector">
+      <select class="js-tree-selector">
+        <option value="#" selected disabled>Select a tree species</option>
+      </select>
+    </div>
+
+
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+
+    <script>
+
+    // get selector
+    var selector = $(".js-tree-selector"),
+        query = "SELECT * FROM ukntrees_adopt_oct62016b_1";
+
+        var map = L.map('map', {
+            center: [38.035, -84.505],
+            zoom: 15,
+
+        });
+
+        $.getJSON('https://npwi222.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM ukntrees_adopt_oct62016b_1', function(data) {
+        // console.log(data); // you have access to the geojson data here!
+
+        L.geoJson(data).addTo(map); // and you can simply use that GeoJSON
+                                                         // data to make a regular Leaflet map
+});
+
+        L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+        }).addTo(map);
+
+
+
+            // .done(function(layer) {
+            //
+            //     // declare sublayer variable
+            //     var treeLayer = layer.getSubLayer(0);
+            //
+            //     console.log(treeLayer)
+            //
+            //     // populate selector with city names from sublayer data
+            //     var sql = new cartodb.SQL({
+            //         user: 'npwi222'
+            //     });
+            //
+            //     sql.execute(query)
+            //         .done(function(data) {
+            //
+            //             for (var i = 0; i < data.total_rows; i++) {
+            //
+            //                 var name = data.rows[i].common;
+            //
+            //                 selector.append("<option value=" + name +  ">" + name + "</option>");
+            //             }
+            //         });
+            //
+            //     selector.select2();
+            //
+            //     // filter cities when selecting an option from selector
+            //     selector.change(function() {
+            //
+            //         var input = $(".js-tree-selector option:selected").html();
+            //
+            //         console.log("You have selected " + input + ".");
+            //
+            //         treeLayer.setSQL(query + " WHERE common = '" + input + "'");
+            //
+            //     });
+            // });
+
+
+    </script>
+</body>
+
+</html>
