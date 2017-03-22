@@ -72,10 +72,22 @@
 
         });
 
-        $.getJSON('https://npwi222.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM ukntrees_adopt_oct62016b_1', function(data) {
-        // console.log(data); // you have access to the geojson data here!
+        var styles = {
+            stroke: false,
+            color: 'green',
+            radius: 3,
+            fillOpacity: 1
+        }
 
-        L.geoJson(data).addTo(map); // and you can simply use that GeoJSON
+        $.getJSON('https://npwi222.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM ukntrees_adopt_oct62016b_1', function(data) {
+
+            console.log(data); // you have access to the geojson data here!
+
+            L.geoJson(data, {
+                pointToLayer: function(feature, ll){
+                    return L.circleMarker(ll, styles);
+                }
+            }).addTo(map); // and you can simply use that GeoJSON
                                                          // data to make a regular Leaflet map
 });
 
