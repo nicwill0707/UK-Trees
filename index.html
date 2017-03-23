@@ -6,8 +6,7 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
     <style>
         html,
         body,
@@ -30,37 +29,37 @@
             border-radius: 5px;
         }
 
-
         #findbox {
-        	background: #eee;
-        	border-radius:.125em;
-        	border:2px solid #1978cf;
-        	box-shadow: 0 0 8px #999;
-        	margin-bottom: 10px;
-        	padding: 2px 0;
-        	width: 600px;
-        	height: 26px;
-        }
-        .search-tooltip {
-        	width: 200px;
-        }
-        .leaflet-control-search .search-cancel {
-        	position: static;
-        	float: left;
-        	margin-left: -22px;
+            background: #eee;
+            border-radius: .125em;
+            border: 2px solid #1978cf;
+            box-shadow: 0 0 8px #999;
+            margin-bottom: 10px;
+            padding: 2px 0;
+            width: 600px;
+            height: 26px;
         }
 
+        .search-tooltip {
+            width: 200px;
+        }
+
+        .leaflet-control-search .search-cancel {
+            position: static;
+            float: left;
+            margin-left: -22px;
+        }
         /* Try Ramiro's code begin */
 
         #wraper-tree-selector {
-          position: absolute;
-          top: 20px;
-          right: 20px;
-        }
-        .js-tree-selector {
-          width: 175px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
         }
 
+        .js-tree-selector {
+            width: 175px;
+        }
     </style>
 </head>
 
@@ -90,16 +89,16 @@
     </div> -->
 
 
-    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
-    <script src="leaflet-search.src.js"></script>
+    <script src="js/leaflet-search.src.js"></script>
 
     <script>
-
-    // get selector
-    var selector = $(".js-tree-selector"),
-        query = "SELECT * FROM ukntrees_adopt_oct62016b_1";
+        // get selector
+        var selector = $(".js-tree-selector"),
+            query = "SELECT * FROM ukntrees_adopt_oct62016b_1";
 
         var map = L.map('map', {
             center: [38.0348, -84.505],
@@ -108,34 +107,34 @@
         });
 
         var styles = {
-          stroke: false,
-          color: 'green',
-          radius: 4,
-          fillOpacity: 1
-      }
+            stroke: false,
+            color: 'green',
+            radius: 4,
+            fillOpacity: 1
+        }
 
-      $.getJSON('https://npwi222.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM ukntrees_adopt_oct62016b_1', function(data) {
+        $.getJSON('https://npwi222.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM ukntrees_adopt_oct62016b_1', function(data) {
 
-          console.log(data); // you have access to the geojson data here!
+            console.log(data); // you have access to the geojson data here!
 
-        var dataLayer = L.geoJson(data, {
+            var dataLayer = L.geoJson(data, {
 
-              pointToLayer: function(feature, ll){
-                  return L.circleMarker(ll, styles);
-              },
-              onEachFeature: function(feature, marker) {
+                pointToLayer: function(feature, ll) {
+                    return L.circleMarker(ll, styles);
+                },
+                onEachFeature: function(feature, marker) {
 
-                var prop = feature.properties
+                    var prop = feature.properties
 
-        				marker.bindPopup('Common: <br>' + prop.common + '<br>' +
-              'Botanical: <br>' + prop.botanical);
-			         }
-          }).addTo(map); // and you can simply use that GeoJSON
-                                                       // data to make a regular Leaflet map
-});
+                    marker.bindTooltip('Common: <br>' + prop.common + '<br>' +
+                        'Botanical: <br>' + prop.botanical);
+                }
+            }).addTo(map); // and you can simply use that GeoJSON
+            // data to make a regular Leaflet map
+        });
 
         L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
         }).addTo(map);
 
 
@@ -145,57 +144,55 @@
         // http://labs.easyblog.it/maps/leaflet-search/examples/outside.html
 
         // var markersLayer = new L.LayerGroup();	//layer contain searched elements
-      	// map.addLayer(markersLayer);
+        // map.addLayer(markersLayer);
         //
-      	// map.addControl( new L.Control.Search({
-      	// 	container: 'findbox',
-      	// 	layer: markersLayer,
-      	// 	initial: false,
-      	// 	collapsed: false
-      	// }) );
-      	// //inizialize search control
+        // map.addControl( new L.Control.Search({
+        // 	container: 'findbox',
+        // 	layer: markersLayer,
+        // 	initial: false,
+        // 	collapsed: false
+        // }) );
+        // //inizialize search control
 
         // end Stefano round 1
 
 
-            // .done(function(layer) {
-            //
-            //     // declare sublayer variable
-            //     var treeLayer = layer.getSubLayer(0);
-            //
-            //     console.log(treeLayer)
-            //
-            //     // populate selector with city names from sublayer data
-            //     var sql = new cartodb.SQL({
-            //         user: 'npwi222'
-            //     });
-            //
-            //     sql.execute(query)
-            //         .done(function(data) {
-            //
-            //             for (var i = 0; i < data.total_rows; i++) {
-            //
-            //                 var name = data.rows[i].common;
-            //
-            //                 selector.append("<option value=" + name +  ">" + name + "</option>");
-            //             }
-            //         });
-            //
-            //     selector.select2();
-            //
-            //     // filter cities when selecting an option from selector
-            //     selector.change(function() {
-            //
-            //         var input = $(".js-tree-selector option:selected").html();
-            //
-            //         console.log("You have selected " + input + ".");
-            //
-            //         treeLayer.setSQL(query + " WHERE common = '" + input + "'");
-            //
-            //     });
-            // });
-
-
+        // .done(function(layer) {
+        //
+        //     // declare sublayer variable
+        //     var treeLayer = layer.getSubLayer(0);
+        //
+        //     console.log(treeLayer)
+        //
+        //     // populate selector with city names from sublayer data
+        //     var sql = new cartodb.SQL({
+        //         user: 'npwi222'
+        //     });
+        //
+        //     sql.execute(query)
+        //         .done(function(data) {
+        //
+        //             for (var i = 0; i < data.total_rows; i++) {
+        //
+        //                 var name = data.rows[i].common;
+        //
+        //                 selector.append("<option value=" + name +  ">" + name + "</option>");
+        //             }
+        //         });
+        //
+        //     selector.select2();
+        //
+        //     // filter cities when selecting an option from selector
+        //     selector.change(function() {
+        //
+        //         var input = $(".js-tree-selector option:selected").html();
+        //
+        //         console.log("You have selected " + input + ".");
+        //
+        //         treeLayer.setSQL(query + " WHERE common = '" + input + "'");
+        //
+        //     });
+        // });
     </script>
 </body>
 
