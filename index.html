@@ -6,8 +6,7 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
-    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
-
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <style>
         html,
         body,
@@ -107,9 +106,9 @@
 
         });
 
-        L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-        }).addTo(map);
+        L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+             maxZoom: 18, attribution: '<a href="https://carto.com/attribution">CARTO</a>'
+         }).addTo(map);
 
 
         var styles = {
