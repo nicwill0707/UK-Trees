@@ -6,7 +6,10 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <!-- <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet"> -->
+    <link href='https://api.mapbox.com/mapbox-assembly/v0.8.0/assembly.min.css' rel='stylesheet'>
+    <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+
     <style>
         html,
         body,
@@ -17,16 +20,16 @@
         }
 
         h1 {
-            position: absolute;
+            /*position: absolute;*/
             z-index: 650;
             top: 10px;
             left: 50px;
             padding: 8px 15px;
             margin: 0;
-            color: whitesmoke;
-            font-size: 2em;
+            color: black;
+            font-size: 1em;
             background: rgba(192, 192, 192, 0.2);
-            border-radius: 5px;
+            border-radius: 2px;
         }
 
         .search-tooltip {
@@ -34,14 +37,16 @@
         }
 
         #search {
-            position: absolute;
-            z-index: 800;
-            top: 65px;
-            right: 75px;
-            height: 300px;
+            position: relative;
+            margin: auto;
+            z-index: 650;
+            /*top: 65px;
+            right: 75px;*/
+            /*height: 300px;*/
             display: block;
-            padding: 8px 15px;
-            margin: 0;
+            padding: 10px 10px;
+            /*margin: 0;*/
+            background: white;
         }
 
         .tt-menu {
@@ -66,41 +71,76 @@
 
         #togGroup {
           position: absolute;
-          z-index: 650;
-          top: 20px;
-          right: 50px;
+          z-index: 800;
+          top: 2px;
+          right: 2px;
           width: 150 px;
-          padding: 8px 15px;
+          padding: 4px 7px;
           margin: 0;
-          background: white;
+          background: rgba(192, 192, 192, 0.8);
         }
+
+        /*.col-2-3 {
+        	width: 66.66%;
+        }
+        .col-1-3 {
+        	width: 33.33%;
+        }*/
 
     </style>
 </head>
 
 
 <body>
-    <h1>University of Kentucky Tree Map</h1>
-    <div id="map"></div>
 
-    <div id="search">
-        <input class="plants" type="text" value="Search tree species">
-    </div>
+  <!-- Begin anew -->
 
-    <div class='col col--12 col--9-ml h180 h-full-ml'>
-    <!-- <div id="map" class='viewport-twothirds viewport-full-ml'></div> -->
-    <div id='togGroup' class='toggle-group'>
+  <div class='grid'>
+      <div class='col col--12 col--3-ml p12 pb6 viewport-third viewport-full-ml'>
+          <div class='h-full scroll-auto'>
+              <h1 class='txt-headline mb6'>University of Kentucky Tree Map</h1>
+              <h2 class='txt-xl mt18 mb12'>How to use</h2>
+              <p><b><i>Hover</i></b> over each tree point and <b><i>toggle</i></b> between base layers on the interactive map, or use
+            the <b><i>search box</i></b> below to filter by species. </p> <br>
+            <p><i>Type name of tree species (common or botanical) and press "enter."</i></p>
+            <div id="search">
+                <input class="plants" type="text" value="Ex: bur oak">
+            </div>
+            <!-- <p><i>Ex: bur oak </i></p> -->
+              <h2 class='txt-xl mt18 mb12'>About the map</h2>
+              <p>There are <strong> over 100 different tree species at UK </strong>. We often think of
+              university libraries as places to learn and excel, but the urban forest serves just
+            as important a function in our built-up areas not only environmentally,
+            but by also promoting stress recovery and wonderment. </p>
 
-        <label class='toggle-container'>Dark
-          <input name='toggle' value="Dark" type='radio' selected />
+              <footer class='mt12 bg-gray-faint txt-s'>
 
-          <label class='toggle-container'>Light
-            <input name='toggle' value="Light" type='radio' />
+                  <ul>
+                      <li>Visit <a class='link' href='https://ukntrees.ca.uky.edu/' target='blank'>UKnTrees</a> to learn more </li>
+                      <li>Map authored by <a href="mailto:nwilliamson@uky.edu?Subject=About%20the%20UK%20Tree%20Map" target="_top">NWilliamson</a></li>
+                      </p>
+              </footer>
 
-        <label class='toggle-container'> Imagery
-          <input name='toggle' value="Imagery" type='radio' />
+          </div>
+      </div>
+      <div class='col col--12 col--9-ml h180 h-full-ml'>
+          <div id="map" class='viewport-twothirds viewport-full-ml'></div>
 
-    </div>
+              <div id='togGroup' class='toggle-group'>
+
+                  <label class='toggle-group'>Dark
+                    <input name='toggle' value="Dark" type='radio' checked/>
+                  </label>
+                    <label class='toggle-group'>Light
+                      <input name='toggle' value="Light" type='radio' />
+                  </label>
+                  <label class='toggle-group'> Imagery
+                    <input name='toggle' value="Imagery" type='radio' />
+                  </label>
+              </div>
+          </div>
+      </div>
+
 
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -114,7 +154,6 @@
 
         });
 
-
         var styles = {
             stroke: false,
             color: 'green',
@@ -124,9 +163,30 @@
 
         var plantNames = [];
 
-        var basemapLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+        //request basemap layers and assign them each a unique variable
+        var mapnikLayer = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        });
+
+        var esriLayer = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        });
+
+
+        var cartoDarkLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
              maxZoom: 18, attribution: '<a href="https://carto.com/attribution">CARTO</a>'
          }).addTo(map);
+
+         // create layerGroup to hold basemap layers (for looping in baseMapControls)
+         var basemapLayers = L.layerGroup([mapnikLayer, esriLayer, cartoDarkLayer]);
+
+         // object to map radio button values to Leaflet layers
+         var basemapMap = {
+             "Dark": cartoDarkLayer,
+             "Light": mapnikLayer,
+             "Imagery": esriLayer
+         }
 
         baseMapcontrols(); //call basemap control UI
 
@@ -156,8 +216,6 @@
                     marker.bindTooltip('Common: <br><b>' + props.common + '</b><br>' +
                         'Botanical: <br><b>' + props.botanical  + '</b>');
                 }
-
-                // addUi(dataLayer);
 
             }).addTo(map);
 
@@ -223,46 +281,26 @@
 
         function baseMapcontrols(){
 
-        $('.toggle-group input').change(function(e) {
+            $('.toggle-group input').change(function(e) {
 
-          map.removeLayer(basemapLayer);
+                // first loop through layers
+                basemapLayers.eachLayer(function(layer){
+                    // determine which one is currently on the map
+                    if(map.hasLayer(layer)){
 
-        var baseUpdate = $(this).val();
-        console.log(baseUpdate);
+                        // remove it
+                        map.removeLayer(layer);
+                    }
+                })
 
+                // get the user input value
+                var baseUpdate = $(this).val();
 
-        if(baseUpdate != 'Light'){
+                // add that basemap to the map
+                basemapMap[baseUpdate].addTo(map);
 
-            newBaselayer = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
-            	maxZoom: 18,
-            	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             })
-          }
-
-          if(baseUpdate != 'Imagery'){
-
-              newBaselayer = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-              })
-            }
-
-          if(baseUpdate != 'Dark'){
-
-              newBaselayer = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-              	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-              	subdomains: 'abcd',
-              	maxZoom: 19
-              })
-            }
-
-            if(newBaselayer){
-              map.removeLayer(newBaselayer);
-            }
-
-            newBaselayer.addTo(map);
-
-          })
-        };
+        }
 
     </script>
 </body>
